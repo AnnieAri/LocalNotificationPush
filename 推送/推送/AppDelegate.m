@@ -35,14 +35,22 @@
     //2.设置按钮 --> 需要使用子类可变子类 才能设置参数信息
     UIMutableUserNotificationAction *action1 = [UIMutableUserNotificationAction new];
     //2.1标识符 -->为了确保能相应正确的通知
-    action1.identifier = @"Mr.Ari";
+    action1.identifier = @"action1";
     //2.2运行模式 -->后台运行/后台运行
     action1.activationMode = UIUserNotificationActivationModeBackground;
     //2.3文字
     action1.title = @"确定";
+    //2.4设置按钮行为  -->前台运行方式不要弄输入框形式,没必要,前台会打开app
+    /**
+     typedef NS_ENUM(NSUInteger, UIUserNotificationActionBehavior) {
+     UIUserNotificationActionBehaviorDefault,        // the default action behavior
+     UIUserNotificationActionBehaviorTextInput       // system provided action behavior, allows text input from the user
+     }
+     */
+    action1.behavior = UIUserNotificationActionBehaviorTextInput;
     UIMutableUserNotificationAction *action2 = [UIMutableUserNotificationAction new];
     //2.1标识符 -->为了确保能相应正确的通知
-    action2.identifier = @"Mr.Ari";
+    action2.identifier = @"action2";
     //2.2运行模式 -->后台运行/后台运行
     action2.activationMode = UIUserNotificationActivationModeForeground;
     //2.3文字
@@ -81,5 +89,29 @@
     //跳转控制器.. 弹出某个弹框....
     NSString *name = notification.userInfo[@"name"];
     NSLog(@"%@",name);
+}
+#pragma mark - 分类按钮点击的方法
+- (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification completionHandler:(void (^)())completionHandler{
+    //区分两个分类按钮的点击 - 点击按钮后的逻辑代码 看程序需求
+    if ([identifier isEqualToString:@"action1"]) {
+        NSLog(@"后台按钮点击了");
+    }else if ([identifier isEqualToString:@"action2"]){
+        NSLog(@"前台按钮点击了");
+    }
+    //苹果会根据你写的这个回调的时间,来自动优化系统内部的调用
+    completionHandler();
+}
+#pragma mark - iOS9 处理文本框通知的方法 - 这个方法实现了,上面的方法就不管用了 - iOS9以前会调用上面的方法
+- (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
+    //区分两个分类按钮的点击 - 点击按钮后的逻辑代码 看程序需求
+    if ([identifier isEqualToString:@"action1"]) {
+        NSLog(@"后台按钮点击了");
+        //内容这样取
+        NSLog(@"%@",responseInfo[UIUserNotificationActionResponseTypedTextKey]);
+    }else if ([identifier isEqualToString:@"action2"]){
+        NSLog(@"前台按钮点击了");
+    }
+    //苹果会根据你写的这个回调的时间,来自动优化系统内部的调用
+    completionHandler();
 }
 @end
